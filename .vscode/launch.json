@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "PHP built-in server (run in terminal instead)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "C:\\PHP\\php.exe",
+      "runtimeArgs": [
+        "-S", "localhost:8000",
+        "-t", "${workspaceFolder}\\public",
+        "${workspaceFolder}\\public\\router.php"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

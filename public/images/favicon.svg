@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Camera body -->
+  <rect x="4" y="11" width="24" height="16" rx="3" fill="#0067C0"/>
+  <!-- Camera lens -->
+  <circle cx="16" cy="19" r="5" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="16" cy="19" r="3" fill="#1975C8"/>
+  <!-- Viewfinder bump -->
+  <rect x="11" y="7" width="10" height="5" rx="2" fill="#0067C0"/>
+  <!-- Flash -->
+  <rect x="6" y="13" width="3" height="2" rx="1" fill="#EFF6FC"/>
+  <!-- Gear overlay (bottom-right) -->
+  <g transform="translate(20,22) scale(0.55)">
+    <circle cx="6" cy="6" r="2.5" fill="#fff"/>
+    <path d="M6 0v2M6 10v2M0 6h2M10 6h2M1.76 1.76l1.41 1.41M6.83 6.83l1.41 1.41M1.76 10.24l1.41-1.41M6.83 5.17l1.41-1.41"
+          stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+</svg>

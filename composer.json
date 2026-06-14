@@ -1,0 +1,7 @@
+{
+    "require": {
+        "symfony/polyfill-mbstring": "^1.38",
+        "mpdf/mpdf": "^8.3",
+        "phpoffice/phpspreadsheet": "^5.8"
+    }
+}

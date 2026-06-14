@@ -1,0 +1,518 @@
+/* =================================================================
+   1. CSS Custom Properties — Windows 11 Fluent Design Tokens
+   ================================================================= */
+:root {
+  --accent:          #0067C0;
+  --accent-hover:    #1975C8;
+  --accent-light:    #EFF6FC;
+  --bg:              #F3F3F3;
+  --surface:         #FFFFFF;
+  --sidebar-bg:      #F0F0F0;
+  --sidebar-width:   240px;
+  --topbar-height:   52px;
+  --border:          #E0E0E0;
+  --border-input:    #D1D1D1;
+  --text-primary:    #1A1A1A;
+  --text-secondary:  #605E5C;
+  --text-disabled:   #A19F9D;
+  --success:         #107C10;
+  --warning:         #CA5010;
+  --danger:          #D13438;
+  --radius:          8px;
+  --radius-sm:       4px;
+  --shadow:          0 2px 6px rgba(0,0,0,0.06);
+  --shadow-md:       0 4px 12px rgba(0,0,0,0.10);
+  --font:            'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-size:       14px;
+}
+
+/* =================================================================
+   2. Base Reset
+   ================================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: var(--font-size); }
+
+body {
+  font-family:      var(--font);
+  font-size:        var(--font-size);
+  color:            var(--text-primary);
+  background-color: var(--bg);
+  margin:           0;
+  line-height:      1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+/* =================================================================
+   3. Shell Layout
+   ================================================================= */
+.fab-topbar {
+  position:         fixed;
+  top:              0; left: 0; right: 0;
+  height:           var(--topbar-height);
+  background:       var(--surface);
+  border-bottom:    1px solid var(--border);
+  display:          flex;
+  align-items:      center;
+  padding:          0 20px;
+  z-index:          1000;
+  gap:              12px;
+}
+
+.fab-topbar-brand {
+  display:          flex;
+  align-items:      center;
+  gap:              10px;
+  font-weight:      600;
+  font-size:        16px;
+  color:            var(--text-primary);
+  text-decoration:  none;
+}
+.fab-topbar-brand:hover { text-decoration: none; color: var(--text-primary); }
+.fab-topbar-logo {
+  height:      36px;
+  width:       auto;
+  object-fit:  contain;
+}
+
+.fab-topbar-spacer { flex: 1; }
+
+.fab-topbar-user {
+  display:          flex;
+  align-items:      center;
+  gap:              8px;
+  font-size:        13px;
+  color:            var(--text-secondary);
+}
+
+.fab-body {
+  display:          flex;
+  margin-top:       var(--topbar-height);
+  min-height:       calc(100vh - var(--topbar-height));
+}
+
+.fab-sidebar {
+  width:            var(--sidebar-width);
+  background:       var(--sidebar-bg);
+  border-right:     1px solid var(--border);
+  position:         fixed;
+  top:              var(--topbar-height);
+  left:             0;
+  bottom:           0;
+  overflow-y:       auto;
+  padding:          12px 0;
+  z-index:          900;
+}
+
+.fab-content {
+  margin-left:      var(--sidebar-width);
+  padding:          28px 28px 48px;
+  flex:             1;
+  min-height:       calc(100vh - var(--topbar-height));
+}
+
+/* =================================================================
+   4. Sidebar Navigation
+   ================================================================= */
+.fab-nav-section {
+  padding:          4px 12px 2px;
+  font-size:        11px;
+  font-weight:      600;
+  color:            var(--text-disabled);
+  text-transform:   uppercase;
+  letter-spacing:   0.06em;
+  margin-top:       12px;
+}
+
+.fab-nav-link {
+  display:          flex;
+  align-items:      center;
+  gap:              10px;
+  padding:          8px 16px 8px 14px;
+  margin:           1px 8px;
+  border-radius:    var(--radius-sm);
+  font-size:        14px;
+  color:            var(--text-primary);
+  text-decoration:  none;
+  border-left:      3px solid transparent;
+  transition:       background 0.1s, color 0.1s;
+}
+.fab-nav-link:hover {
+  background:       var(--accent-light);
+  color:            var(--accent);
+  text-decoration:  none;
+}
+.fab-nav-link.active {
+  background:       var(--accent-light);
+  color:            var(--accent);
+  border-left-color: var(--accent);
+  font-weight:      600;
+}
+.fab-nav-link svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.75; }
+.fab-nav-link.active svg { opacity: 1; }
+
+/* =================================================================
+   5. Cards
+   ================================================================= */
+.fab-card {
+  background:       var(--surface);
+  border:           1px solid var(--border);
+  border-radius:    var(--radius);
+  box-shadow:       var(--shadow);
+  padding:          20px 24px;
+}
+
+.fab-stat-card {
+  background:       var(--surface);
+  border:           1px solid var(--border);
+  border-radius:    var(--radius);
+  box-shadow:       var(--shadow);
+  padding:          20px 24px;
+  display:          flex;
+  flex-direction:   column;
+  gap:              8px;
+  border-top:       3px solid var(--accent);
+  transition:       box-shadow 0.15s;
+}
+.fab-stat-card:hover { box-shadow: var(--shadow-md); }
+
+.fab-stat-card.stat-active   { border-top-color: var(--success); }
+.fab-stat-card.stat-expiring { border-top-color: var(--warning); }
+.fab-stat-card.stat-expired  { border-top-color: var(--danger);  }
+.fab-stat-card.stat-amc      { border-top-color: #6f42c1; }
+
+.fab-stat-value {
+  font-size:        32px;
+  font-weight:      600;
+  line-height:      1;
+  color:            var(--text-primary);
+}
+.fab-stat-label {
+  font-size:        13px;
+  color:            var(--text-secondary);
+}
+
+/* Page header */
+.fab-page-header {
+  display:          flex;
+  align-items:      center;
+  justify-content:  space-between;
+  margin-bottom:    20px;
+}
+.fab-page-title {
+  font-size:        20px;
+  font-weight:      600;
+  margin:           0;
+  color:            var(--text-primary);
+}
+
+/* =================================================================
+   6. Tables
+   ================================================================= */
+.fab-table-wrap {
+  background:       var(--surface);
+  border:           1px solid var(--border);
+  border-radius:    var(--radius);
+  box-shadow:       var(--shadow);
+  overflow:         hidden;
+}
+
+.fab-table {
+  width:            100%;
+  border-collapse:  collapse;
+  font-size:        14px;
+}
+.fab-table thead th {
+  background:       #FAFAFA;
+  border-bottom:    1px solid var(--border);
+  padding:          10px 14px;
+  text-align:       left;
+  font-weight:      600;
+  color:            var(--text-secondary);
+  font-size:        12px;
+  text-transform:   uppercase;
+  letter-spacing:   0.04em;
+}
+.fab-table tbody tr {
+  border-bottom:    1px solid #F0F0F0;
+  transition:       background 0.1s;
+}
+.fab-table tbody tr:nth-child(even) { background: #FAFAFA; }
+.fab-table tbody tr:hover           { background: var(--accent-light); }
+.fab-table tbody td {
+  padding:          10px 14px;
+  vertical-align:   middle;
+}
+.fab-table tbody tr:last-child { border-bottom: none; }
+
+/* =================================================================
+   7. Buttons
+   ================================================================= */
+.btn-accent {
+  background-color: var(--accent);
+  border-color:     var(--accent);
+  color:            #fff;
+  border-radius:    var(--radius-sm);
+  font-family:      var(--font);
+  font-size:        14px;
+  padding:          6px 16px;
+}
+.btn-accent:hover, .btn-accent:focus {
+  background-color: var(--accent-hover);
+  border-color:     var(--accent-hover);
+  color:            #fff;
+}
+.btn { border-radius: var(--radius-sm); font-family: var(--font); font-size: 14px; }
+.btn-sm { padding: 3px 10px; font-size: 13px; }
+.btn-filter-clear {
+  background-color: #e9ecef;
+  border-color:     #ced4da;
+  color:            #495057;
+  border-radius:    var(--radius-sm);
+  font-family:      var(--font);
+  font-size:        14px;
+  padding:          6px 16px;
+}
+.btn-filter-clear:hover, .btn-filter-clear:focus {
+  background-color: #dee2e6;
+  border-color:     #adb5bd;
+  color:            #343a40;
+}
+
+/* =================================================================
+   8. Forms
+   ================================================================= */
+.form-control, .form-select {
+  font-family:      var(--font);
+  font-size:        14px;
+  border:           1px solid var(--border-input);
+  border-radius:    var(--radius-sm);
+  color:            var(--text-primary);
+}
+.form-control:focus, .form-select:focus {
+  border-color:     var(--accent);
+  box-shadow:       0 0 0 2px rgba(0,103,192,0.20);
+  outline:          none;
+}
+.form-label {
+  font-size:        13px;
+  font-weight:      600;
+  color:            var(--text-secondary);
+  margin-bottom:    4px;
+}
+.fab-section-label {
+  font-size:        11px;
+  font-weight:      600;
+  color:            var(--text-disabled);
+  text-transform:   uppercase;
+  letter-spacing:   0.06em;
+  border-bottom:    1px solid var(--border);
+  padding-bottom:   6px;
+  margin-bottom:    16px;
+  margin-top:       8px;
+}
+
+/* =================================================================
+   9. Status Badges
+   ================================================================= */
+.badge { border-radius: 20px; font-size: 12px; font-weight: 600; padding: 3px 10px; }
+
+.badge-active       { background: #DFF6DD; color: var(--success);  border: 1px solid #A9D9A4; }
+.badge-expired      { background: #FDE7E9; color: var(--danger);   border: 1px solid #F4ACAC; }
+.badge-grace        { background: #FFF4CE; color: var(--warning);  border: 1px solid #F6D490; }
+.badge-revoked      { background: #F0F0F0; color: var(--text-disabled); border: 1px solid var(--border); }
+.badge-amc-active   { background: #DFF6DD; color: var(--success);  border: 1px solid #A9D9A4; }
+.badge-amc-expired  { background: #FDE7E9; color: var(--danger);   border: 1px solid #F4ACAC; }
+.badge-na           { background: #F0F0F0; color: var(--text-disabled); border: 1px solid var(--border); }
+.badge-admin        { background: #EFF6FC; color: var(--accent);   border: 1px solid #B3D6F2; }
+.badge-sales        { background: #F0F0F0; color: var(--text-secondary); border: 1px solid var(--border); }
+
+/* =================================================================
+   10. Auth Layout
+   ================================================================= */
+.fab-auth-bg {
+  min-height:       100vh;
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+  background:       var(--bg);
+  padding:          24px;
+}
+
+.fab-auth-card {
+  background:       var(--surface);
+  border:           1px solid var(--border);
+  border-radius:    var(--radius);
+  box-shadow:       var(--shadow-md);
+  padding:          40px 40px 32px;
+  width:            100%;
+  max-width:        400px;
+}
+
+.fab-auth-logo {
+  display:          flex;
+  align-items:      center;
+  gap:              10px;
+  margin-bottom:    8px;
+}
+.fab-auth-logo-img {
+  height:      64px;
+  width:       auto;
+  object-fit:  contain;
+  margin-bottom: 4px;
+}
+.fab-auth-tagline {
+  font-size:        13px;
+  color:            var(--text-secondary);
+  margin-bottom:    28px;
+}
+
+/* =================================================================
+   11. Utility
+   ================================================================= */
+.text-accent    { color: var(--accent) !important; }
+.text-muted-fab { color: var(--text-secondary); }
+.text-success   { color: var(--success) !important; }
+.text-danger-fab{ color: var(--danger)  !important; }
+
+.fab-search-bar {
+  display:          flex;
+  gap:              8px;
+  align-items:      center;
+}
+.fab-search-bar .form-control { min-width: 220px; }
+
+.action-links { display: flex; align-items: center; gap: 4px; }
+.action-links .btn-sm { padding: 3px 7px; line-height: 1.4; }
+
+.days-badge {
+  font-size:   12px;
+  font-weight: 600;
+  padding:     2px 8px;
+  border-radius: 20px;
+}
+.days-ok       { background: #DFF6DD; color: var(--success); }
+.days-warning  { background: #FFF4CE; color: var(--warning); }
+.days-critical { background: #FDE7E9; color: var(--danger);  }
+.days-expired  { background: #F0F0F0; color: var(--text-disabled); }
+
+/* =================================================================
+   12. Responsive — Mobile (≤ 767px)
+   ================================================================= */
+
+/* Hamburger toggle — hidden on desktop, shown on mobile */
+.fab-hamburger {
+  display:         none;
+  align-items:     center;
+  justify-content: center;
+  background:      none;
+  border:          none;
+  cursor:          pointer;
+  padding:         6px 8px;
+  border-radius:   var(--radius-sm);
+  color:           var(--text-primary);
+  line-height:     1;
+  flex-shrink:     0;
+}
+.fab-hamburger:hover { background: var(--accent-light); }
+
+/* Full-screen overlay behind the mobile sidebar */
+.fab-sidebar-overlay {
+  display:         none;
+  position:        fixed;
+  inset:           0;
+  background:      rgba(0, 0, 0, 0.40);
+  z-index:         850;
+}
+.fab-sidebar-overlay.active { display: block; }
+
+@media (max-width: 767px) {
+
+  /* --- Hamburger --- */
+  .fab-hamburger { display: flex; }
+
+  /* --- Sidebar: off-screen by default, slides in --- */
+  .fab-sidebar {
+    transform:  translateX(-100%);
+    transition: transform 0.24s ease;
+    box-shadow: var(--shadow-md);
+  }
+  .fab-sidebar.open { transform: translateX(0); }
+
+  /* --- Content: full-width --- */
+  .fab-content {
+    margin-left: 0;
+    padding:     16px 16px 40px;
+  }
+
+  /* --- Page header: stack vertically --- */
+  .fab-page-header {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            10px;
+    margin-bottom:  16px;
+  }
+
+  /* --- Search bar: wrap onto multiple lines --- */
+  .fab-search-bar {
+    flex-wrap: wrap;
+  }
+  .fab-search-bar .form-control {
+    flex:      1 1 auto;
+    min-width: 0;
+  }
+
+  /* --- Stat card value: slightly smaller --- */
+  .fab-stat-value { font-size: 26px; }
+
+  /* --- Topbar: hide user name text, keep icon+badge+logout --- */
+  .fab-topbar-user > span:first-of-type { display: none; }
+
+  /* --- Auth card: less padding on phone --- */
+  .fab-auth-card { padding: 28px 20px 24px; }
+}
+
+/* =================================================================
+   13. Searchable Select
+   ================================================================= */
+.fab-ss-wrap {
+  position: relative;
+}
+.fab-ss-input {
+  width: 100%;
+  cursor: text;
+}
+.fab-ss-panel {
+  display:          none;
+  position:         absolute;
+  top:              calc(100% + 3px);
+  left:             0;
+  right:            0;
+  z-index:          1060;
+  background:       var(--surface);
+  border:           1px solid #dee2e6;
+  border-radius:    var(--radius);
+  box-shadow:       0 6px 20px rgba(0,0,0,.12);
+  max-height:       220px;
+  overflow-y:       auto;
+}
+.fab-ss-panel.open { display: block; }
+.fab-ss-item {
+  padding:       8px 12px;
+  cursor:        pointer;
+  font-size:     14px;
+  color:         var(--text-primary);
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+}
+.fab-ss-item:hover   { background: var(--accent-light); color: var(--accent); }
+.fab-ss-item.is-selected { background: var(--accent-light); color: var(--accent); font-weight: 500; }
+.fab-ss-no-result {
+  padding:   8px 12px;
+  color:     var(--text-muted);
+  font-size: 13px;
+}

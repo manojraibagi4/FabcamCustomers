@@ -1,0 +1,6 @@
+RewriteEngine On
+
+# If Apache doc root is the project root, serve public/ assets directly
+# and route everything else through public/index.php
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^(.*)$ public/index.php [QSA,L]

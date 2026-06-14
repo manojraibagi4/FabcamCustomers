@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start PHP Server",
+      "type": "shell",
+      "command": "C:\\PHP\\php.exe",
+      "args": [
+        "-dxdebug.mode=debug",
+        "-dxdebug.start_with_request=yes",
+        "-dxdebug.client_host=127.0.0.1",
+        "-dxdebug.client_port=9003",
+        "-S", "localhost:8000",
+        "-t", "${workspaceFolder}\\public",
+        "${workspaceFolder}\\public\\router.php"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "php",
+        "pattern": {
+          "regexp": "^(.*):(\\d+):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "PHP Development Server",
+          "endsPattern": "started"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}
