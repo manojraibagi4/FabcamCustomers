@@ -473,6 +473,9 @@ a:hover { color: var(--accent-hover); text-decoration: underline; }
 
   /* --- Auth card: less padding on phone --- */
   .fab-auth-card { padding: 28px 20px 24px; }
+
+  /* --- Auth logo: smaller on phone --- */
+  .fab-auth-logo-img { height: 44px; max-width: 160px; }
 }
 
 /* =================================================================

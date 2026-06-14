@@ -39,8 +39,15 @@ class Controller {
     protected function validateCsrf(): void {
         $token = $_POST['_csrf'] ?? '';
         if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
-            http_response_code(403);
-            die('Invalid CSRF token.');
+            // Regenerate so the next attempt gets a fresh token
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            $this->flash('danger', 'Your session expired — please try again.');
+            $referer = $_SERVER['HTTP_REFERER'] ?? '';
+            $path    = '/login';
+            if ($referer && str_starts_with($referer, BASE_URL)) {
+                $path = parse_url($referer, PHP_URL_PATH) ?: '/login';
+            }
+            $this->redirect($path);
         }
     }
 
