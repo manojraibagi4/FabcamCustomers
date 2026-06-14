@@ -1,4 +1,16 @@
 <?php
+$sortUrl = function(string $col) use ($sort, $dir, $filters): string {
+    $newDir = ($col === $sort && $dir === 'asc') ? 'desc' : 'asc';
+    $activeFilters = array_filter($filters, fn($v) => $v !== '' && $v !== 0);
+    return '?' . http_build_query(array_merge($activeFilters, ['sort' => $col, 'dir' => $newDir]));
+};
+$sortIcon = function(string $col) use ($sort, $dir): string {
+    if ($col !== $sort) return '<i class="bi bi-arrow-down-up" style="font-size:10px;opacity:.25"></i>';
+    return $dir === 'asc'
+        ? '<i class="bi bi-caret-up-fill" style="font-size:10px;color:var(--accent)"></i>'
+        : '<i class="bi bi-caret-down-fill" style="font-size:10px;color:var(--accent)"></i>';
+};
+
 function daysClass(int $d): string {
     if ($d < 0)   return 'days-expired';
     if ($d <= 7)  return 'days-critical';
@@ -33,6 +45,14 @@ function daysClass(int $d): string {
     </option>
     <?php endforeach; ?>
   </select>
+  <select name="customer_id" class="form-select" style="width:auto" data-searchable>
+    <option value="">All Customers</option>
+    <?php foreach ($customers as $c): ?>
+    <option value="<?= (int)$c['id'] ?>" <?= (int)($filters['customer_id'] ?? 0) === (int)$c['id'] ? 'selected' : '' ?>>
+      <?= htmlspecialchars($c['company_name'], ENT_QUOTES, 'UTF-8') ?>
+    </option>
+    <?php endforeach; ?>
+  </select>
   <button type="submit" class="btn btn-accent"><i class="bi bi-funnel me-1"></i>Filter</button>
   <a href="<?= BASE_URL ?>/licenses" class="btn btn-filter-clear"><i class="bi bi-x-lg me-1"></i>Clear</a>
 </form>
@@ -45,15 +65,15 @@ function daysClass(int $d): string {
     <table class="fab-table">
       <thead>
         <tr>
-          <th>Customer</th>
-          <th>Product</th>
-          <th>Type</th>
+          <th><a href="<?= $sortUrl('company_name') ?>" class="fab-sort-th <?= $sort==='company_name'?'is-sorted':'' ?>">Customer <?= $sortIcon('company_name') ?></a></th>
+          <th><a href="<?= $sortUrl('product_name') ?>" class="fab-sort-th <?= $sort==='product_name'?'is-sorted':'' ?>">Product <?= $sortIcon('product_name') ?></a></th>
+          <th><a href="<?= $sortUrl('license_type') ?>" class="fab-sort-th <?= $sort==='license_type'?'is-sorted':'' ?>">Type <?= $sortIcon('license_type') ?></a></th>
           <th>Server Code</th>
           <th>Machine Name</th>
-          <th>Expiry Date</th>
-          <th>Days Left</th>
-          <th>Status</th>
-          <th>AMC</th>
+          <th><a href="<?= $sortUrl('expiry_date') ?>" class="fab-sort-th <?= $sort==='expiry_date'?'is-sorted':'' ?>">Expiry Date <?= $sortIcon('expiry_date') ?></a></th>
+          <th><a href="<?= $sortUrl('days_left') ?>" class="fab-sort-th <?= $sort==='days_left'?'is-sorted':'' ?>">Days Left <?= $sortIcon('days_left') ?></a></th>
+          <th><a href="<?= $sortUrl('license_status') ?>" class="fab-sort-th <?= $sort==='license_status'?'is-sorted':'' ?>">Status <?= $sortIcon('license_status') ?></a></th>
+          <th><a href="<?= $sortUrl('amc_status') ?>" class="fab-sort-th <?= $sort==='amc_status'?'is-sorted':'' ?>">AMC <?= $sortIcon('amc_status') ?></a></th>
           <th></th>
         </tr>
       </thead>
@@ -100,3 +120,7 @@ function daysClass(int $d): string {
   </div>
   <?php endif; ?>
 </div>
+<?php
+$paginationParams = array_filter(array_merge($filters, ['sort' => $sort, 'dir' => $dir]), fn($v) => $v !== '' && $v !== 0);
+require __DIR__ . '/../partials/pagination.php';
+?>

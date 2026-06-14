@@ -1,10 +1,17 @@
 <?php
 function daysClass(int $days): string {
-    if ($days < 0)  return 'days-expired';
-    if ($days <= 7) return 'days-critical';
+    if ($days < 0)   return 'days-expired';
+    if ($days <= 7)  return 'days-critical';
     if ($days <= 30) return 'days-warning';
     return 'days-ok';
 }
+$activeCount   = (int)($stats['active_licenses']  ?? 0);
+$expiredCount  = (int)($stats['expired_licenses'] ?? 0);
+$graceCount    = (int)($stats['grace_licenses']   ?? 0);
+$revokedCount  = (int)($stats['revoked_licenses'] ?? 0);
+$amcActive     = (int)($stats['amc_active']       ?? 0);
+$amcExpired    = (int)($stats['amc_expired']       ?? 0);
+$amcNa         = (int)($stats['amc_na']            ?? 0);
 ?>
 <div class="fab-page-header">
   <h1 class="fab-page-title">Dashboard</h1>
@@ -20,7 +27,7 @@ function daysClass(int $days): string {
   </div>
   <div class="col-sm-6 col-xl">
     <div class="fab-stat-card stat-active">
-      <div class="fab-stat-value"><?= (int)($stats['active_licenses'] ?? 0) ?></div>
+      <div class="fab-stat-value"><?= $activeCount ?></div>
       <div class="fab-stat-label">Active Licenses</div>
     </div>
   </div>
@@ -32,7 +39,7 @@ function daysClass(int $days): string {
   </div>
   <div class="col-sm-6 col-xl">
     <div class="fab-stat-card stat-expired">
-      <div class="fab-stat-value"><?= (int)($stats['expired_licenses'] ?? 0) ?></div>
+      <div class="fab-stat-value"><?= $expiredCount ?></div>
       <div class="fab-stat-label">Expired Licenses</div>
     </div>
   </div>
@@ -44,6 +51,63 @@ function daysClass(int $days): string {
     </div>
   </div>
   <?php endif; ?>
+</div>
+
+<!-- Charts row -->
+<div class="row g-3 mb-4">
+
+  <!-- Donut chart: License Status -->
+  <div class="col-lg-5">
+    <div class="fab-card h-100">
+      <h6 class="fw-semibold mb-3">License Status Distribution</h6>
+      <div style="position:relative;height:220px;display:flex;align-items:center;justify-content:center;">
+        <canvas id="licenseStatusChart"></canvas>
+      </div>
+      <div class="d-flex flex-wrap justify-content-center gap-3 mt-3" style="font-size:13px">
+        <span class="d-flex align-items-center gap-1">
+          <span style="width:12px;height:12px;border-radius:50%;background:#107C10;flex-shrink:0"></span>
+          Active <strong><?= $activeCount ?></strong>
+        </span>
+        <span class="d-flex align-items-center gap-1">
+          <span style="width:12px;height:12px;border-radius:50%;background:#CA5010;flex-shrink:0"></span>
+          Grace <strong><?= $graceCount ?></strong>
+        </span>
+        <span class="d-flex align-items-center gap-1">
+          <span style="width:12px;height:12px;border-radius:50%;background:#D13438;flex-shrink:0"></span>
+          Expired <strong><?= $expiredCount ?></strong>
+        </span>
+        <span class="d-flex align-items-center gap-1">
+          <span style="width:12px;height:12px;border-radius:50%;background:#A19F9D;flex-shrink:0"></span>
+          Revoked <strong><?= $revokedCount ?></strong>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bar chart: AMC Status -->
+  <div class="col-lg-7">
+    <div class="fab-card h-100">
+      <h6 class="fw-semibold mb-3">AMC Status Breakdown</h6>
+      <div style="position:relative;height:220px;">
+        <canvas id="amcStatusChart"></canvas>
+      </div>
+      <div class="d-flex flex-wrap justify-content-center gap-3 mt-3" style="font-size:13px">
+        <span class="d-flex align-items-center gap-1">
+          <span style="width:12px;height:12px;border-radius:2px;background:#107C10;flex-shrink:0"></span>
+          AMC Active <strong><?= $amcActive ?></strong>
+        </span>
+        <span class="d-flex align-items-center gap-1">
+          <span style="width:12px;height:12px;border-radius:2px;background:#D13438;flex-shrink:0"></span>
+          AMC Expired <strong><?= $amcExpired ?></strong>
+        </span>
+        <span class="d-flex align-items-center gap-1">
+          <span style="width:12px;height:12px;border-radius:2px;background:#E0E0E0;flex-shrink:0"></span>
+          Not Applicable <strong><?= $amcNa ?></strong>
+        </span>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- Expiring soon table -->
@@ -94,3 +158,81 @@ function daysClass(int $days): string {
   </div>
   <?php endif; ?>
 </div>
+
+<!-- Chart.js (dashboard only) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  Chart.defaults.font.family = "'Segoe UI', system-ui, -apple-system, sans-serif";
+  Chart.defaults.font.size   = 13;
+
+  // --- Donut: License Status ---
+  new Chart(document.getElementById('licenseStatusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Active', 'Grace', 'Expired', 'Revoked'],
+      datasets: [{
+        data: [<?= $activeCount ?>, <?= $graceCount ?>, <?= $expiredCount ?>, <?= $revokedCount ?>],
+        backgroundColor: ['#107C10', '#CA5010', '#D13438', '#A19F9D'],
+        borderWidth: 2,
+        borderColor: '#fff',
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      cutout: '68%',
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+              const pct   = total ? Math.round(ctx.parsed / total * 100) : 0;
+              return ' ' + ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // --- Bar: AMC Status ---
+  new Chart(document.getElementById('amcStatusChart'), {
+    type: 'bar',
+    data: {
+      labels: ['AMC Active', 'AMC Expired', 'Not Applicable'],
+      datasets: [{
+        label: 'Licenses',
+        data: [<?= $amcActive ?>, <?= $amcExpired ?>, <?= $amcNa ?>],
+        backgroundColor: ['#107C10', '#D13438', '#E0E0E0'],
+        borderRadius: 4,
+        borderSkipped: false,
+        maxBarThickness: 56,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) { return ' ' + ctx.parsed.y + ' licenses'; }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, border: { display: false } },
+        y: {
+          beginAtZero: true,
+          ticks: { stepSize: 1, precision: 0 },
+          grid: { color: '#F0F0F0' },
+          border: { display: false }
+        }
+      }
+    }
+  });
+})();
+</script>

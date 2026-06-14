@@ -4,6 +4,12 @@
   </div>
   <p class="fab-auth-tagline">License &amp; Customer Management Portal</p>
 
+  <?php if (!empty($_GET['timeout'])): ?>
+  <div class="alert alert-warning py-2 mb-3">
+    Your session expired due to inactivity. Please log in again.
+  </div>
+  <?php endif; ?>
+
   <?php if (!empty($errors)): ?>
   <div class="alert alert-danger py-2 mb-3">
     <?php foreach ($errors as $e): ?>

@@ -4,20 +4,37 @@ class LicenseController extends Controller {
 
     public function index(): void {
         $this->requireAuth();
-        $filters  = [
-            'status'     => $_GET['status']     ?? '',
-            'product_id' => $_GET['product_id'] ?? '',
-            'amc_status' => $_GET['amc_status'] ?? '',
+        $filters = [
+            'status'      => $_GET['status']      ?? '',
+            'product_id'  => $_GET['product_id']  ?? '',
+            'amc_status'  => $_GET['amc_status']  ?? '',
+            'customer_id' => (int)($_GET['customer_id'] ?? 0) ?: '',
         ];
-        $model    = new LicenseModel();
-        $licenses = $model->getAll($filters);
-        $products = (new ProductModel())->getAll();
+        $page       = max(1, (int)($_GET['page'] ?? 1));
+        $sort       = $_GET['sort'] ?? 'expiry_date';
+        $dir        = $_GET['dir']  ?? 'asc';
+        $perPage    = 20;
+        $offset     = ($page - 1) * $perPage;
+
+        $model      = new LicenseModel();
+        $total      = $model->getCount($filters);
+        $licenses   = $model->getAll($filters, $perPage, $offset, $sort, $dir);
+        $products   = (new ProductModel())->getAll();
+        $customers  = (new CustomerModel())->getAll();
+        $totalPages = (int) ceil($total / $perPage);
 
         $this->render('licenses/index', [
-            'pageTitle' => 'Licenses',
-            'licenses'  => $licenses,
-            'products'  => $products,
-            'filters'   => $filters,
+            'pageTitle'  => 'Licenses',
+            'licenses'   => $licenses,
+            'products'   => $products,
+            'customers'  => $customers,
+            'filters'    => $filters,
+            'page'       => $page,
+            'totalPages' => $totalPages,
+            'total'      => $total,
+            'perPage'    => $perPage,
+            'sort'       => $sort,
+            'dir'        => $dir,
         ]);
     }
 

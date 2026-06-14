@@ -4,13 +4,28 @@ class CustomerController extends Controller {
 
     public function index(): void {
         $this->requireAuth();
-        $search    = trim($_GET['search'] ?? '');
-        $model     = new CustomerModel();
-        $customers = $model->getAll($search);
+        $search     = trim($_GET['search'] ?? '');
+        $page       = max(1, (int)($_GET['page'] ?? 1));
+        $sort       = $_GET['sort'] ?? 'company_name';
+        $dir        = $_GET['dir']  ?? 'asc';
+        $perPage    = 20;
+        $offset     = ($page - 1) * $perPage;
+
+        $model      = new CustomerModel();
+        $total      = $model->getCount($search);
+        $customers  = $model->getPaginated($search, $offset, $perPage, $sort, $dir);
+        $totalPages = (int) ceil($total / $perPage);
+
         $this->render('customers/index', [
-            'pageTitle' => 'Customers',
-            'customers' => $customers,
-            'search'    => $search,
+            'pageTitle'  => 'Customers',
+            'customers'  => $customers,
+            'search'     => $search,
+            'page'       => $page,
+            'totalPages' => $totalPages,
+            'total'      => $total,
+            'perPage'    => $perPage,
+            'sort'       => $sort,
+            'dir'        => $dir,
         ]);
     }
 

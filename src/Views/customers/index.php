@@ -1,3 +1,15 @@
+<?php
+$sortUrl = function(string $col) use ($sort, $dir, $search): string {
+    $newDir = ($col === $sort && $dir === 'asc') ? 'desc' : 'asc';
+    return '?' . http_build_query(array_filter(['search' => $search, 'sort' => $col, 'dir' => $newDir]));
+};
+$sortIcon = function(string $col) use ($sort, $dir): string {
+    if ($col !== $sort) return '<i class="bi bi-arrow-down-up" style="font-size:10px;opacity:.25"></i>';
+    return $dir === 'asc'
+        ? '<i class="bi bi-caret-up-fill" style="font-size:10px;color:var(--accent)"></i>'
+        : '<i class="bi bi-caret-down-fill" style="font-size:10px;color:var(--accent)"></i>';
+};
+?>
 <div class="fab-page-header">
   <h1 class="fab-page-title">Customers</h1>
   <a href="<?= BASE_URL ?>/customers/add" class="btn btn-accent"><i class="bi bi-plus-lg me-1"></i>Add Customer</a>
@@ -21,13 +33,13 @@
     <table class="fab-table" id="customerTable">
       <thead>
         <tr>
-          <th>Customer ID</th>
-          <th>Company Name</th>
-          <th>Contact</th>
+          <th><a href="<?= $sortUrl('customer_id') ?>" class="fab-sort-th <?= $sort==='customer_id'?'is-sorted':'' ?>">Customer ID <?= $sortIcon('customer_id') ?></a></th>
+          <th><a href="<?= $sortUrl('company_name') ?>" class="fab-sort-th <?= $sort==='company_name'?'is-sorted':'' ?>">Company Name <?= $sortIcon('company_name') ?></a></th>
+          <th><a href="<?= $sortUrl('contact_person') ?>" class="fab-sort-th <?= $sort==='contact_person'?'is-sorted':'' ?>">Contact <?= $sortIcon('contact_person') ?></a></th>
           <th>Mobile</th>
           <th>Email</th>
           <th>GST Number</th>
-          <th>Added</th>
+          <th><a href="<?= $sortUrl('created_at') ?>" class="fab-sort-th <?= $sort==='created_at'?'is-sorted':'' ?>">Added <?= $sortIcon('created_at') ?></a></th>
           <th></th>
         </tr>
       </thead>
@@ -62,3 +74,7 @@
   </div>
   <?php endif; ?>
 </div>
+<?php
+$paginationParams = array_filter(['search' => $search, 'sort' => $sort, 'dir' => $dir]);
+require __DIR__ . '/../partials/pagination.php';
+?>

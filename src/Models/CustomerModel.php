@@ -23,6 +23,50 @@ class CustomerModel extends BaseModel {
         )->fetchAll();
     }
 
+    public function getCount(string $search = ''): int {
+        if ($search) {
+            $like = '%' . $search . '%';
+            $stmt = $this->pdo->prepare(
+                'SELECT COUNT(*) FROM customers
+                 WHERE company_name LIKE ? OR customer_id LIKE ? OR contact_person LIKE ?'
+            );
+            $stmt->execute([$like, $like, $like]);
+        } else {
+            $stmt = $this->pdo->query('SELECT COUNT(*) FROM customers');
+        }
+        return (int) $stmt->fetchColumn();
+    }
+
+    public function getPaginated(string $search, int $offset, int $limit, string $sort = 'company_name', string $dir = 'asc'): array {
+        $allowed  = ['company_name' => 'c.company_name', 'customer_id' => 'c.customer_id', 'contact_person' => 'c.contact_person', 'created_at' => 'c.created_at'];
+        $orderCol = $allowed[$sort] ?? 'c.company_name';
+        $orderDir = strtolower($dir) === 'desc' ? 'DESC' : 'ASC';
+        $orderSql = "{$orderCol} {$orderDir}";
+
+        if ($search) {
+            $like = '%' . $search . '%';
+            $stmt = $this->pdo->prepare(
+                "SELECT c.*, u.name AS created_by_name
+                 FROM customers c
+                 LEFT JOIN users u ON u.id = c.created_by
+                 WHERE c.company_name LIKE ? OR c.customer_id LIKE ? OR c.contact_person LIKE ?
+                 ORDER BY {$orderSql}
+                 LIMIT {$limit} OFFSET {$offset}"
+            );
+            $stmt->execute([$like, $like, $like]);
+        } else {
+            $stmt = $this->pdo->prepare(
+                "SELECT c.*, u.name AS created_by_name
+                 FROM customers c
+                 LEFT JOIN users u ON u.id = c.created_by
+                 ORDER BY {$orderSql}
+                 LIMIT {$limit} OFFSET {$offset}"
+            );
+            $stmt->execute();
+        }
+        return $stmt->fetchAll();
+    }
+
     public function findById(int $id): array|false {
         $stmt = $this->pdo->prepare(
             'SELECT c.*, u.name AS created_by_name

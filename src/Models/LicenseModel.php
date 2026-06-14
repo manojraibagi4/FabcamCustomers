@@ -2,33 +2,21 @@
 
 class LicenseModel extends BaseModel {
 
-    public function getAll(array $filters = []): array {
-        $where  = [];
-        $params = [];
+    public function getAll(array $filters = [], int $limit = 0, int $offset = 0, string $sort = 'expiry_date', string $dir = 'asc'): array {
+        [$whereSql, $params] = $this->buildWhere($filters);
 
-        $allowed_status = ['active', 'expired', 'grace', 'revoked'];
-        if (!empty($filters['status']) && in_array($filters['status'], $allowed_status)) {
-            $where[]  = 'l.license_status = ?';
-            $params[] = $filters['status'];
-        }
-
-        if (!empty($filters['product_id'])) {
-            $where[]  = 'l.product_id = ?';
-            $params[] = (int) $filters['product_id'];
-        }
-
-        if (!empty($filters['customer_id'])) {
-            $where[]  = 'l.customer_id = ?';
-            $params[] = (int) $filters['customer_id'];
-        }
-
-        $allowed_amc = ['active', 'expired', 'not_applicable'];
-        if (!empty($filters['amc_status']) && in_array($filters['amc_status'], $allowed_amc)) {
-            $where[]  = 'l.amc_status = ?';
-            $params[] = $filters['amc_status'];
-        }
-
-        $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+        $allowed  = [
+            'company_name'   => 'c.company_name',
+            'product_name'   => 'p.product_name',
+            'license_type'   => 'l.license_type',
+            'expiry_date'    => 'l.expiry_date',
+            'days_left'      => 'DATEDIFF(l.expiry_date, CURDATE())',
+            'license_status' => 'l.license_status',
+            'amc_status'     => 'l.amc_status',
+        ];
+        $orderCol    = $allowed[$sort] ?? 'l.expiry_date';
+        $orderDir    = strtolower($dir) === 'desc' ? 'DESC' : 'ASC';
+        $paginateSql = $limit > 0 ? " LIMIT {$limit} OFFSET {$offset}" : '';
 
         $sql = "SELECT l.*, DATEDIFF(l.expiry_date, CURDATE()) AS days_left,
                        c.company_name, c.customer_id AS cust_code,
@@ -37,12 +25,49 @@ class LicenseModel extends BaseModel {
                 JOIN customers c ON c.id = l.customer_id
                 JOIN products  p ON p.id = l.product_id
                 LEFT JOIN users u ON u.id = l.updated_by
-                $whereSql
-                ORDER BY l.expiry_date ASC";
+                {$whereSql}
+                ORDER BY {$orderCol} {$orderDir}{$paginateSql}";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt->fetchAll();
+    }
+
+    public function getCount(array $filters = []): int {
+        [$whereSql, $params] = $this->buildWhere($filters);
+        $sql  = "SELECT COUNT(*) FROM licenses l
+                 JOIN customers c ON c.id = l.customer_id
+                 JOIN products  p ON p.id = l.product_id
+                 {$whereSql}";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return (int) $stmt->fetchColumn();
+    }
+
+    private function buildWhere(array $filters): array {
+        $where  = [];
+        $params = [];
+
+        $allowed_status = ['active', 'expired', 'grace', 'revoked'];
+        if (!empty($filters['status']) && in_array($filters['status'], $allowed_status)) {
+            $where[]  = 'l.license_status = ?';
+            $params[] = $filters['status'];
+        }
+        if (!empty($filters['product_id'])) {
+            $where[]  = 'l.product_id = ?';
+            $params[] = (int) $filters['product_id'];
+        }
+        if (!empty($filters['customer_id'])) {
+            $where[]  = 'l.customer_id = ?';
+            $params[] = (int) $filters['customer_id'];
+        }
+        $allowed_amc = ['active', 'expired', 'not_applicable'];
+        if (!empty($filters['amc_status']) && in_array($filters['amc_status'], $allowed_amc)) {
+            $where[]  = 'l.amc_status = ?';
+            $params[] = $filters['amc_status'];
+        }
+
+        return [$where ? 'WHERE ' . implode(' AND ', $where) : '', $params];
     }
 
     public function findById(int $id): array|false {
@@ -79,11 +104,16 @@ class LicenseModel extends BaseModel {
         $row = $this->pdo->query(
             "SELECT
                COUNT(DISTINCT c.id)                                                AS total_customers,
-               SUM(CASE WHEN l.license_status = 'active' THEN 1 ELSE 0 END)       AS active_licenses,
+               SUM(CASE WHEN l.license_status = 'active'  THEN 1 ELSE 0 END)      AS active_licenses,
                SUM(CASE WHEN l.license_status = 'expired' THEN 1 ELSE 0 END)      AS expired_licenses,
+               SUM(CASE WHEN l.license_status = 'grace'   THEN 1 ELSE 0 END)      AS grace_licenses,
+               SUM(CASE WHEN l.license_status = 'revoked' THEN 1 ELSE 0 END)      AS revoked_licenses,
                SUM(CASE WHEN l.license_status IN ('active','grace')
                          AND DATEDIFF(l.expiry_date, CURDATE()) BETWEEN 0 AND 30
                          THEN 1 ELSE 0 END)                                        AS expiring_soon,
+               SUM(CASE WHEN l.amc_status = 'active'         THEN 1 ELSE 0 END)   AS amc_active,
+               SUM(CASE WHEN l.amc_status = 'expired'        THEN 1 ELSE 0 END)   AS amc_expired,
+               SUM(CASE WHEN l.amc_status = 'not_applicable' THEN 1 ELSE 0 END)   AS amc_na,
                COALESCE(SUM(CASE WHEN l.amc_status = 'expired' THEN l.amc_cost ELSE 0 END), 0)
                                                                                    AS total_amc_revenue
              FROM licenses l
