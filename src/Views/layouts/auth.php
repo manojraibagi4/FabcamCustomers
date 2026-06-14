@@ -11,9 +11,6 @@
   <link rel="stylesheet" href="<?= BASE_URL ?>/css/app.css">
 </head>
 <body class="fab-auth-bg">
-  <div style="width:100%;max-width:400px;margin:0 auto;padding-top:16px;">
-    <?php require __DIR__ . '/../partials/flash.php'; ?>
-  </div>
   <?php require $viewPath; ?>
   <script src="<?= BASE_URL ?>/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="<?= BASE_URL ?>/js/app.js"></script>

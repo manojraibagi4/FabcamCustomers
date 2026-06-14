@@ -1,10 +1,6 @@
 RewriteEngine On
 RewriteBase /
 
-# ---- HTTPS redirect (uncomment once SSL certificate is installed) ----
-# RewriteCond %{HTTPS} off
-# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
 # Route all non-file, non-directory requests through index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
