@@ -1,6 +1,6 @@
 <?php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'fabcam');
-define('DB_USER', 'root');
-define('DB_PASS', '1234');
+define('DB_NAME', 'customersfabcam');
+define('DB_USER', 'arun_fabcam');
+define('DB_PASS', 'arun_fabcam@2026');
 define('DB_CHARSET', 'utf8mb4');

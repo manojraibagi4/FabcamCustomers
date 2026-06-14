@@ -1,7 +1,7 @@
 <?php
 
 define('APP_NAME', 'Fabcam Technologies');
-define('APP_ENV',  'development'); // change to 'production' when deploying
+define('APP_ENV',  'production'); // 'development' for localhost
 
 // Set BASE_PATH if app lives in a subdirectory e.g. '/FabcamNewWebsite'
 // Leave empty string '' if served from doc root
