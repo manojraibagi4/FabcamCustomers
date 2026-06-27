@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(Move-Item *)"
+      "PowerShell(Move-Item *)",
+      "Bash(git -C D:/FabcamNewWebsite log --oneline)"
     ]
   }
 }
